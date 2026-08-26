@@ -6,10 +6,99 @@ datasource db{
     provider = "postgresql"
 }
 
-model User{
-    id  Int @id @default(autoincrement())
-    name    String
-    email   String @unique
-    createdAt   DateTime    @default(now())     
-    updatedAt DateTime @updatedAt
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+
+  workspacesOwned Workspace[]  // workspaces this user owns
+  memberships     Membership[] // workspaces this user belongs to
+  channelsCreated Channel[]
+  ChannelMembership ChannelMembership[]
+  message Message[]
+}
+
+model Workspace {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique          // unique so invite links (/w/acme-corp) work
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownerId Int
+  owner   User @relation(fields: [ownerId], references: [id])
+
+  memberships Membership[]  // all members of this workspace, via join table
+  channels    Channel[]     // you'll add this when you build Channel
+}
+
+model Membership {
+  id        Int      @id @default(autoincrement())
+  role      Role     @default(MEMBER)
+  joinedAt  DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  workspaceId Int
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([userId, workspaceId])  // prevents a user joining the same workspace twice
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model Channel {
+  id        Int      @id @default(autoincrement())
+  name String
+  isPrivate Boolean
+
+  workspaceId Int
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  
+  userId Int 
+  createdBy User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([name, workspaceId])
+  memberships ChannelMembership[]
+  messages Message[]
+}
+
+model ChannelMembership {
+   id        Int      @id @default(autoincrement())
+
+    userId Int 
+    user User @relation(fields:[userId], references:[id])
+
+
+    channelId Int
+    channel Channel @relation(fields:[channelId], references:[id])
+
+   joinedAt DateTime @default(now())
+
+   @@unique([userId, channelId])
+
+}
+
+model Message {
+  id      Int    @id @default(autoincrement())
+  content String
+
+  channelId Int
+  channel   Channel @relation(fields: [channelId], references: [id])
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  threadParentId Int?
+  threadParent   Message?  @relation("ThreadReplies", fields: [threadParentId], references: [id])
+  replies        Message[] @relation("ThreadReplies")
+
+  createdAt DateTime @default(now())
 }
