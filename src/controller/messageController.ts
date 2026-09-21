@@ -157,10 +157,73 @@ const sendMessage = asyncHandler(async (req, res) => {
   res.status(201).json({ message });
 });
 
+const threadReplyParamsSchema = z.object({
+  messageId: z.coerce.number(),
+});
 
 const threadReply = asyncHandler(async (req, res) => {
-   
+  const paramsResult = threadReplyParamsSchema.safeParse(req.params);
+  if (!paramsResult.success) {
+    res.status(400).json({ message: "Invalid message id", errors: z.treeifyError(paramsResult.error) });
+    return;
+  }
+
+  const { messageId } = paramsResult.data;
+
+  const parentMessage = await prisma.message.findUnique({
+    where: { id: messageId },
+  });
+
+  if (!parentMessage) {
+    res.status(404).json({ message: "Message not found" });
+    return;
+  }
+
+  const replies = await prisma.message.findMany({
+    where: { threadParentId: messageId },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      user: { select: { id: true, name: true } },
+    },
+  });
+
+  res.status(200).json({ replies });
 });
-const deleteOwnMessage = asyncHandler(async (req, res) => {});
+
+const deleteOwnMessage = asyncHandler(async (req, res) => {
+  const paramsResult = threadReplyParamsSchema.safeParse(req.params); // reuses same { messageId } shape
+  if (!paramsResult.success) {
+    res.status(400).json({ message: "Invalid message id", errors: z.treeifyError(paramsResult.error) });
+    return;
+  }
+
+  const { messageId } = paramsResult.data;
+
+  if (!req.user) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  const message = await prisma.message.findUnique({
+    where: { id: messageId },
+  });
+
+  if (!message) {
+    res.status(404).json({ message: "Message not found" });
+    return;
+  }
+
+  if (message.userId !== req.user.id) {
+    res.status(403).json({ message: "You can only delete your own messages" });
+    return;
+  }
+
+  await prisma.message.delete({ where: { id: messageId } });
+
+  res.status(204).send();
+});
 
 export { getMessageHistory, sendMessage, threadReply, deleteOwnMessage };

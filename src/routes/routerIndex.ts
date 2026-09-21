@@ -17,6 +17,12 @@ import {
   listChannels,
   listPrivateChannelMembers,
 } from "../controller/channelController";
+import {
+  deleteOwnMessage,
+  getMessageHistory,
+  sendMessage,
+  threadReply,
+} from "../controller/messageController";
 
 const router = express.Router();
 
@@ -47,5 +53,9 @@ router.get(
 ); //listPrivateChannelMembers
 
 // Channel routes
+router.get("/channel/:channelId", requireAuth, getMessageHistory);
+router.post("/channel/:channelId", requireAuth, sendMessage);
+router.get("/message/:messageId/replies", requireAuth, threadReply);
+router.delete("/message/:messageId", requireAuth, deleteOwnMessage);
 
 export default router;
