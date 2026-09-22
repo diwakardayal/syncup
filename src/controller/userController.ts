@@ -39,14 +39,14 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   });
 
   if (!existing) {
-    res.status(409).json({ message: "User doesnt exist" });
+    res.status(404).json({ message: "User doesnt exist" });
     return;
   }
 
   const isMatch = await bcrypt.compare(password, existing.password);
 
   if (!isMatch) {
-    res.status(409).json({ message: "Wrong password" });
+    res.status(401).json({ message: "Wrong password" });
     return;
   }
 
@@ -66,4 +66,12 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   //
 });
 
-export { registerUser, loginUser };
+const logoutUser = asyncHandler(async (req: Request, res: Response) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+});
+
+export { registerUser, loginUser, logoutUser };

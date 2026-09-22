@@ -1,5 +1,9 @@
 import express from "express";
-import { loginUser, registerUser } from "../controller/userController";
+import {
+  loginUser,
+  logoutUser,
+  registerUser,
+} from "../controller/userController";
 import requireAuth from "../middleware/auth";
 import {
   checkSlugExist,
@@ -7,6 +11,7 @@ import {
   deleteWorkspace,
   getAllMembersAndRole,
   getWorkspace,
+  joinWorkspace,
   updateWorkspace,
 } from "../controller/workspaceController";
 import {
@@ -28,33 +33,25 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/logout", logoutUser);
+
 router.post("/workspace", requireAuth, createWorkspace);
 router.post("/checkSlug", requireAuth, checkSlugExist);
-router.get("/workspace/:slug", requireAuth);
-// router.get("/workspace/:slug/join");
-router.patch("/workspaces/:slug", requireAuth, updateWorkspace);
-router.delete("/workspaces/:slug", requireAuth, deleteWorkspace);
-
-// Get all members & role
-router.get("/workspaces/:slug/members", requireAuth, getAllMembersAndRole);
-router.post(" /workspaces/:slug/channel", requireAuth, createChannel);
-router.get("/workspaces/:slug/listChannel", requireAuth, listChannels);
-router.get("/channel/:channelId", requireAuth, listChannels);
 router.get("/workspace/:slug", requireAuth, getWorkspace);
+router.patch("/workspace/:slug", requireAuth, updateWorkspace);
+router.delete("/workspace/:slug", requireAuth, deleteWorkspace);
+router.get("/workspace/:slug/members", requireAuth, getAllMembersAndRole);
+router.post("/workspace/:slug/join", requireAuth, joinWorkspace);
 
-// Channel routes
+router.post("/workspace/:slug/channel", requireAuth, createChannel);
+router.get("/workspace/:slug/channels", requireAuth, listChannels);
 router.get("/channel/:channelId", requireAuth, getChannel);
-router.get("/channel/:channelId/join", requireAuth, joinPrivateChannel);
-router.get("/channel/:channelId/delete", requireAuth, deleteChannel);
-router.get(
-  "/channel/:channelId/members",
-  requireAuth,
-  listPrivateChannelMembers,
-); //listPrivateChannelMembers
+router.post("/channel/:channelId/join", requireAuth, joinPrivateChannel);
+router.delete("/channel/:channelId", requireAuth, deleteChannel);
+router.get("/channel/:channelId/members", requireAuth, listPrivateChannelMembers);
 
-// Channel routes
-router.get("/channel/:channelId", requireAuth, getMessageHistory);
-router.post("/channel/:channelId", requireAuth, sendMessage);
+router.get("/channel/:channelId/messages", requireAuth, getMessageHistory);
+router.post("/channel/:channelId/messages", requireAuth, sendMessage);
 router.get("/message/:messageId/replies", requireAuth, threadReply);
 router.delete("/message/:messageId", requireAuth, deleteOwnMessage);
 
