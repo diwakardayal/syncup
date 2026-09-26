@@ -5,7 +5,34 @@ import { prisma } from "../lib/prisma";
 import asyncHandler from "../middleware/asyncHandler";
 import { slugify } from "../utils/slugify";
 
-const createWorkspace = asyncHandler(async (req, res) => {
+const listWorkspaces = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  const memberships = await prisma.membership.findMany({
+    where: {
+      userId: req.user.id,
+    },
+    select: {
+      role: true,
+      workspace: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  });
+
+  res.status(200).json({
+    memberships,
+  });
+});
+
+const getWorkspaces = asyncHandler(async (req, res) => {
   const { name } = req.body;
   const userSlug = req.body.slug;
 
@@ -15,18 +42,18 @@ const createWorkspace = asyncHandler(async (req, res) => {
   }
 
   // check if the userSlug exist in db
-  const validatedSlug = userSlug.toLowerCase().trim().replace(/\s+/g, "-");
+  const validatedSlug = slugify(userSlug);
 
   const existing = await prisma.workspace.findUnique({
     where: { slug: validatedSlug },
   });
 
   if (existing) {
-    res.status(409).json({ message: "Choose new slug" });
+    res.status(409).json({ message: "Choose new slug / Workspace exist" });
     return;
   }
 
-  await prisma.workspace.create({
+  const workspace = await prisma.workspace.create({
     data: {
       name,
       slug: validatedSlug,
@@ -39,6 +66,46 @@ const createWorkspace = asyncHandler(async (req, res) => {
       },
     },
   });
+
+  res.status(201).json({ workspace });
+});
+
+const createWorkspace = asyncHandler(async (req, res) => {
+  const { name } = req.body;
+  const userSlug = req.body.slug;
+
+  if (!req.user) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  // check if the userSlug exist in db
+  const validatedSlug = slugify(userSlug);
+
+  const existing = await prisma.workspace.findUnique({
+    where: { slug: validatedSlug },
+  });
+
+  if (existing) {
+    res.status(409).json({ message: "Choose new slug / Workspace exist" });
+    return;
+  }
+
+  const workspace = await prisma.workspace.create({
+    data: {
+      name,
+      slug: validatedSlug,
+      ownerId: req.user?.id,
+      memberships: {
+        create: {
+          userId: req.user?.id,
+          role: "ADMIN",
+        },
+      },
+    },
+  });
+
+  res.status(201).json({ workspace });
 });
 
 const checkSlugExist = asyncHandler(async (req, res) => {
@@ -250,11 +317,12 @@ const getAllMembersAndRole = asyncHandler(async (req, res) => {
 });
 
 export {
+  getWorkspaces,
   createWorkspace,
   checkSlugExist,
   getWorkspace,
   joinWorkspace,
   updateWorkspace,
   deleteWorkspace,
-  getAllMembersAndRole
+  getAllMembersAndRole,
 };

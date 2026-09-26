@@ -32,9 +32,10 @@ const createChannel = asyncHandler(async (req, res) => {
 
   const { slug } = paramsResult.data;
   const { name, isPrivate } = bodyResult.data;
+  const validatedSlug = slugify(slug);
 
   const existingWorkspace = await prisma.workspace.findUnique({
-    where: { slug: slug },
+    where: { slug: validatedSlug },
   });
 
   if (!existingWorkspace) {
@@ -67,9 +68,10 @@ const listChannels = asyncHandler(async (req, res) => {
   }
 
   const { slug } = paramsResult.data;
+  const validatedSlug = slugify(slug);
 
   const existingWorkspace = await prisma.workspace.findUnique({
-    where: { slug },
+    where: { slug: validatedSlug },
   });
 
   if (!existingWorkspace) {

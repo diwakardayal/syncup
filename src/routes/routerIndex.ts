@@ -11,6 +11,7 @@ import {
   deleteWorkspace,
   getAllMembersAndRole,
   getWorkspace,
+  getWorkspaces,
   joinWorkspace,
   updateWorkspace,
 } from "../controller/workspaceController";
@@ -44,6 +45,7 @@ router.get("/workspace/:slug/members", requireAuth, getAllMembersAndRole);
 router.post("/workspace/:slug/join", requireAuth, joinWorkspace);
 
 router.post("/workspace/:slug/channel", requireAuth, createChannel);
+router.get('/workspace', requireAuth, getWorkspaces)
 router.get("/workspace/:slug/channels", requireAuth, listChannels);
 router.get("/channel/:channelId", requireAuth, getChannel);
 router.post("/channel/:channelId/join", requireAuth, joinPrivateChannel);
