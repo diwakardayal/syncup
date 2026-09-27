@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Workspace from "./pages/Workspace";
+import WorkspacePicker from "./pages/WorkspacePicker";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/workspaces" element={<WorkspacePicker />} />
         <Route path="/workspace/:slug" element={<Workspace />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>

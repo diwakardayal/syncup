@@ -21,7 +21,6 @@ const WorkspacePicker = () => {
         const data = await res.json();
         setMemberships(data.memberships);
 
-        // if exactly one workspace, skip the picker entirely
         if (data.memberships.length === 1) {
           navigate(`/workspace/${data.memberships[0].workspace.slug}`);
         }
@@ -42,7 +41,6 @@ const WorkspacePicker = () => {
     return (
       <div className="p-4">
         <p>You're not part of any workspace yet.</p>
-        {/* link to a "create workspace" page/form, once you build one */}
       </div>
     );
   }
