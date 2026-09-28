@@ -19,10 +19,12 @@ const WorkspacePicker = () => {
         if (!res.ok) throw new Error("Failed to load workspaces");
 
         const data = await res.json();
-        setMemberships(data.memberships);
+        setMemberships(data.workspaces);
 
-        if (data.memberships.length === 1) {
-          navigate(`/workspace/${data.memberships[0].workspace.slug}`);
+        console.log("DATA: ", data)
+
+        if (data.workspaces.length === 1) {
+          navigate(`/workspace/${data.workspaces[0].workspace.slug}`);
         }
       } catch (err: any) {
         setError(err.message);
@@ -30,7 +32,7 @@ const WorkspacePicker = () => {
         setLoading(false);
       }
     };
-
+    console.log("CORRECT .>>>>>")
     loadWorkspaces();
   }, [navigate]);
 

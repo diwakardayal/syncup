@@ -52,7 +52,7 @@ const getWorkspaces = asyncHandler(async (req, res) => {
     },
   });
 
-  res.status(200).json({ workspace: memberships });
+  res.status(200).json({ workspaces: memberships });
 });
 
 const createWorkspace = asyncHandler(async (req, res) => {
