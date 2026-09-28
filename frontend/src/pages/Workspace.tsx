@@ -54,7 +54,7 @@ const Workspace = () => {
             className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
           >
             👤 {placeholderMembers.length} members
-          </b
+          </button>
         </header>
 
         <div className="flex-1 flex overflow-hidden">
