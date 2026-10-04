@@ -51,6 +51,11 @@ const createChannel = asyncHandler(async (req, res) => {
       isPrivate,
       workspaceId: existingWorkspace.id,
       userId: req.user!.id,
+      memberships: {
+      create: {
+        userId: req.user!.id,
+      },
+    },
     },
   });
 
@@ -103,7 +108,7 @@ const getChannel = asyncHandler(async (req, res) => {
 
   const { channelId } = req.params;
 
-  const channel = await prisma.channel.findUnique({ where: { id: channelId } });
+  const channel = await prisma.channel.findUnique({ where: { id: parseInt(channelId, 10) } });
 
   if (!channel) {
     res.status(404).json({ message: "Channel not found" });

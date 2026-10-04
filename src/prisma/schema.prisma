@@ -58,6 +58,7 @@ model Channel {
   id        Int      @id @default(autoincrement())
   name String
   isPrivate Boolean
+  Description String?
 
   workspaceId Int
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
