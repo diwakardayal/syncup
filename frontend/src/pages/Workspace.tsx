@@ -65,7 +65,7 @@ const Workspace = () => {
     })();
   }, []);
 
-  async function sendMessage(message) {
+  async function sendMessage(message: string) {
     console.log("channelData: ", channelData);
     if (!channelData?.channel?.id) {
       return;
@@ -154,13 +154,18 @@ const Workspace = () => {
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           <button
-            onClick={sendMessage}
-            className={
-              message.trim().length > 1 ? "text-green-600" : "text-blue-500"
-            }
+            onClick={() => sendMessage(message)}
+            disabled={message.trim().length === 0}
+            className={`w-10 h-10 flex items-center justify-center ml-2 rounded-md transition ${
+              message.trim().length > 0
+                ? "bg-purple-700 hover:bg-purple-800 text-white cursor-pointer"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
           >
-            <SendIcon />
-          </button>
+            <span className="flex items-center justify-center w-5 h-5 -translate-x-px translate-y-px">
+              <SendIcon />
+            </span>
+          </button> 
         </div>
       </div>
     </div>
