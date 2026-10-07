@@ -27,7 +27,7 @@ const Workspace = () => {
   const [showMembers, setShowMembers] = useState(false);
   const [channelsList, setChannelsList] = useState([]);
   const [channelData, setChannelData] = useState();
-  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<any[]>([]);
 
   const paras = useParams();
   console.log("paras", paras.slug);
@@ -154,8 +154,9 @@ const Workspace = () => {
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           <button
-            onClick={() => sendMessage(message)}
-            disabled={message.trim().length === 0}
+            // onClick={() => sendMessage(message)}
+            // disabled={message.trim().length === 0}
+            onChange={e=> setMessage(e.target.value)}
             className={`w-10 h-10 flex items-center justify-center ml-2 rounded-md transition ${
               message.trim().length > 0
                 ? "bg-purple-700 hover:bg-purple-800 text-white cursor-pointer"
