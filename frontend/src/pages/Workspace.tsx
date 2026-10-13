@@ -4,12 +4,6 @@ import { useParams } from "react-router-dom";
 import MembersModal from "../components/MembersModal";
 import SendIcon from "../Icons/sendIcon";
 
-const placeholderMembers = [
-  { id: 1, name: "Alex Kim" },
-  { id: 2, name: "Priya Shah" },
-  { id: 3, name: "Jordan Lee" },
-];
-
 const getChannelInfo = async (channelId: number) => {
   const [channelRes, membersRes] = await Promise.all([
     axios.get(`/api/channel/${channelId}`),
@@ -27,7 +21,7 @@ const Workspace = () => {
   const [showMembers, setShowMembers] = useState(false);
   const [channelsList, setChannelsList] = useState([]);
   const [channelData, setChannelData] = useState();
-  const [messages, setMessages] = useState<any[]>([]);
+  const [message, setMessages] = useState<any[]>([]);
 
   const paras = useParams();
   console.log("paras", paras.slug);
@@ -77,7 +71,7 @@ const Workspace = () => {
         content: message,
       });
 
-      setMessage("");
+      setMessages("");
     } catch (error) {
       console.log("sendMessage Error: ", error);
     }
@@ -148,7 +142,7 @@ const Workspace = () => {
         <div className="border-t px-4 py-3 flex items-center">
           <input
             content={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => setMessages(e.target.value)}
             type="text"
             placeholder={`Message #${activeChannel.name}`}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -156,7 +150,7 @@ const Workspace = () => {
           <button
             // onClick={() => sendMessage(message)}
             // disabled={message.trim().length === 0}
-            onChange={e=> setMessage(e.target.value)}
+            onChange={e=> setMessages(e.target.value)}
             className={`w-10 h-10 flex items-center justify-center ml-2 rounded-md transition ${
               message.trim().length > 0
                 ? "bg-purple-700 hover:bg-purple-800 text-white cursor-pointer"
